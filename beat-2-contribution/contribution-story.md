@@ -22,7 +22,7 @@ I installed the voice-guard and updated my repro-check scope to allow real repos
 I used plan-check to verify my analysis and implementation steps. Since I initially did not have the Rust toolchain installed, I couldn't run the tests before pushing. After opening the PR, I installed Rust 1.88.0 locally to verify the code. I discovered the package name in Cargo was `sovd-interfaces` (not the folder name), ran the tests successfully, and updated my PR with the real evidence.
 
 **Unit 8: Used the PR-monitor to check the status of my submission.**
-I monitored the PR thread manually after opening it. The PR monitor drafted a nudge, but before I could send it, the maintainer (`alexmohr`) left a review requesting changes. Instead of nudging, I addressed the maintainer's feedback, updated my commit with the required legal `Signed-off-by` line, and replied to him directly. This was a concrete moment where the tool's recommendation had to be overridden by the reality of the PR thread.
+I monitored the PR thread manually after opening it. The PR monitor drafted a nudge, but before I could send it, the maintainer (`alexmohr`) left a review requesting changes. Instead of nudging, I addressed the maintainer's feedback, updated my commit with the required legal `Signed-off-by` line, and replied to them directly. This was a concrete moment where the tool's recommendation had to be overridden by the reality of the PR thread.
 
 ---
 
@@ -32,7 +32,7 @@ I used my issue-scout to search for Python documentation issues, but the scout c
 
 **Toolkit**
 
-- Tool: issue-scout
+- Tool: issue-scout (used to scan GitHub for beginner-friendly issues and filter out ghost issues)
 - What it produced: Accepted the Rust issue after I expanded my search beyond Python.
 - Difficulties: It initially accepted a Python issue that was actually already fixed by a merged PR.
 - What changed: I added a `not_already_fixed` check to my rubric to catch ghost issues.
@@ -55,7 +55,7 @@ The `cda-sovd-interfaces` crate.
 
 **Toolkit**
 
-- Tool: repro-check
+- Tool: repro-check (used to verify my claim and reproduction steps against the rubric)
 - What it produced: Verified the missing docstrings in the codebase and accepted my report.
 - Difficulties: It could not verify the generated OpenAPI schema because I did not generate it locally at first.
 - What changed: I revised my report to explicitly state that I was relying on visual inspection of the source code initially.
@@ -69,6 +69,8 @@ The `cda-sovd-interfaces` crate.
 - Rust: 1.88.0 (pinned in the Makefile)
 - Repo: classic-diagnostic-adapter
 - Commit: a686835
+- **Setup Commands:** `git clone`, `git checkout a686835`.
+- **Difficulties:** I did not have the Rust toolchain installed initially. I had to install Rust 1.88.0. Additionally, the Cargo package name is `sovd-interfaces`, but the folder is `cda-sovd-interfaces`, which caused my initial test commands to fail until I found the correct package name.
 
 **Steps to Reproduce**
 0. Clone the repository and checkout commit `a686835`.
@@ -84,7 +86,7 @@ The `cda-sovd-interfaces` crate.
 
 **Toolkit**
 
-- Tool: repro-check
+- Tool: repro-check (used to validate my reproduction steps and environment details)
 - What it produced: An accepted reproduction package.
 - Difficulties: Rejected my first draft for guessing the Rust version and lacking an explicit outcome.
 - What changed: Updated the environment setup to match the Makefile and added an explicit outcome line.
@@ -105,7 +107,7 @@ Add appropriate `///` docstrings to the missing structs and fields. After mainta
 
 **Toolkit**
 
-- Tool: plan-check
+- Tool: plan-check (used to verify my implementation plan and branch name)
 - What it produced: Accepted my plan and verified the branch name was correct.
 - Difficulties: I did not have Rust installed locally initially, so I couldn't verify the tests beforehand.
 - What changed: I adjusted my plan to rely on GitHub Actions for CI testing initially, then installed Rust later to test locally.
@@ -120,7 +122,7 @@ I used two observable checks to validate my fix:
 
 **Toolkit**
 
-- Tool: cargo test (Rust toolchain)
+- Tool: cargo test (Rust toolchain used to run the test suite and verify the build)
 - What it produced: 25 passing tests and verified schema output.
 - Difficulties: The folder name is `cda-sovd-interfaces`, but the Cargo package name is `sovd-interfaces`. My initial commands failed until I found the correct package name.
 - What changed: I updated my plan and PR description to use the correct `cargo test -p sovd-interfaces` command.
@@ -145,11 +147,11 @@ Opened PR #704. Realized the Eclipse ECA check failed due to a placeholder email
 Installed Rust 1.88.0 locally. Discovered the Cargo package name was `sovd-interfaces`. Ran the tests successfully (25 passed) and generated the schema to confirm the docstrings appeared.
 
 **2026-11-11 (Addressing Review)**
-The maintainer requested changes: fix the EOF newline, improve the `items` docstring, and document the remaining fields. I updated the code, amended the commit to include the required `Signed-off-by` legal line, signed the Eclipse ECA, and force-pushed. Replied to the maintainer. Removed trailing whitespace from two blank lines and force-pushed again.
+The maintainer requested changes: re-add the EOF newline, rewrite the `items` docstring to be more descriptive, and document the remaining fields. I updated the code, amended the commit to include the required `Signed-off-by` legal line, signed the Eclipse ECA, and force-pushed. Replied to the maintainer. Removed trailing whitespace from two blank lines and force-pushed again.
 
 **Toolkit**
 
-- Tool: GitHub CLI (`gh`)
+- Tool: GitHub CLI (gh) (used to create the branch, commit, and open the PR)
 - What it produced: Created the branch, commit, and PR.
 - Difficulties: `gh` CLI initially failed because it didn't know which repo to target.
 - What changed: Ran `gh repo set-default` to point to the upstream repository.
@@ -161,7 +163,7 @@ The maintainer requested changes: fix the EOF newline, improve the `items` docst
 **PR Link:** https://github.com/eclipse-opensovd/classic-diagnostic-adapter/pull/704
 
 **PR Description:** 
-This PR adds missing Rust docstrings to the `ComponentQuery` struct and the `ComponentsResponse` struct. Fixes #144. Added `///` docstrings to `ComponentQuery` and its fields. Added a docstring to `items` based on feedback. Added docstrings to `additional_fields` and `schema` as requested by the maintainer. Verified locally with `cargo test` (25 passed).
+This PR adds missing Rust docstrings to the `ComponentQuery` struct and the `ComponentsResponse` struct. Fixes #144. Added `///` docstrings to `ComponentQuery` and its fields. Added a docstring to `items` based on feedback. Added docstrings to `additional_fields` and `schema` as requested by the maintainer. Verified locally with `cargo test` (25 passed). AI Disclosure: I used Claude to help format the docstrings and run the tests.
 
 **Maintainer Feedback:**
 
@@ -172,7 +174,7 @@ This PR adds missing Rust docstrings to the `ComponentQuery` struct and the `Com
 
 **Toolkit**
 
-- Tool: PR Monitor
+- Tool: PR Monitor (used to check the PR thread for maintainer feedback)
 - What it produced: Drafted a nudge message.
 - Difficulties: The PR received human feedback before a nudge was needed.
 - What changed: I ignored the nudge and addressed the maintainer's actual review comments.
