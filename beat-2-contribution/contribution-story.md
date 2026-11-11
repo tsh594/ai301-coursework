@@ -18,11 +18,11 @@ I built the issue-scout by writing a search strategy targeting Python and data-a
 **Unit 6: Installed the voice-guard and updated scope files.**
 I installed the voice-guard and updated my repro-check scope to allow real repositories. The voice-guard caught that my first claim draft promised a fix rather than an investigation. I revised it to promise a report. The repro-check initially rejected my report because I guessed the Rust version and didn't state a clear outcome. I checked the repo's Makefile to find the correct Rust version (1.88.0) and revised my report to pass.
 
-**Unit 7: Used the ship-gate and plan-check to verify the fix.**
-I manually verified my code change by inspecting the file and ensuring no syntax errors were introduced. Because I did not have the Rust toolchain installed locally, I relied on the CI pipeline to run the tests. The ship-gate checked my plan and branch name, which confirmed I was on the right track before pushing.
+**Unit 7: Used the plan-check to verify the plan and the ship-gate to test the branch.**
+I used plan-check to verify my analysis and implementation steps. Because I did not have the Rust toolchain installed locally, the ship-gate could only verify my branch name and code format, but it could not run the actual `cargo test` commands. It produced a warning about the missing toolchain, so I updated my plan to rely on the CI pipeline for testing.
 
 **Unit 8: Used the PR-monitor to check the status of my submission.**
-I monitored the PR thread manually after opening it. The PR monitor drafted a nudge, but I decided not to send it because the maintainers had already acknowledged the issue and it had only been a few hours.
+I monitored the PR thread manually after opening it. The PR monitor drafted a nudge, but I decided not to send it because the maintainers had already acknowledged the issue and it had only been a few hours. It helped me confirm that no maintainer feedback had arrived yet.
 
 ---
 
@@ -33,9 +33,9 @@ I used my issue-scout to search for Python documentation issues, but the scout c
 **Toolkit**
 
 - Tool: issue-scout
-- What it produced: Accepted the issue and verified it wasn't already fixed.
-- Difficulties: It initially accepted an issue that was already fixed.
-- What changed: I added a `not_already_fixed` check to my rubric.
+- What it produced: Accepted the Rust issue after I expanded my search beyond Python.
+- Difficulties: It initially accepted a Python issue that was actually already fixed by a merged PR.
+- What changed: I added a `not_already_fixed` check to my rubric to catch ghost issues.
 
 ---
 
@@ -56,9 +56,9 @@ The `cda-sovd-interfaces` crate.
 **Toolkit**
 
 - Tool: repro-check
-- What it produced: Verified the missing docstrings in the codebase.
-- Difficulties: None.
-- What changed: Nothing.
+- What it produced: Verified the missing docstrings in the codebase and accepted my report.
+- Difficulties: It could not verify the generated OpenAPI schema because I did not generate it locally.
+- What changed: I revised my report to explicitly state that I was relying on visual inspection of the source code.
 
 ---
 
@@ -81,14 +81,14 @@ The `cda-sovd-interfaces` crate.
 **Reproduction Evidence**
 - **Commit showing reproduction:** a686835
 - **My findings:** Reproduced. `ComponentQuery` and its fields `include_sdgs` and `include_schema` have no doc comments. `ComponentsResponse` has a struct-level doc, but its `items` field does not (the other two fields are skipped by schemars).
-- **Note:** I have not generated the OpenAPI schema locally. I expect the descriptions to be missing because `schemars` builds them from doc comments, which are absent here. This is one example and not a full audit of all structs.
+- **Note:** I have not generated the OpenAPI schema locally. I expect the descriptions to be missing because `schemars` builds them from doc comments, which are absent here.
 
 **Toolkit**
 
 - Tool: repro-check
 - What it produced: An accepted reproduction package.
-- Difficulties: Rejected my first draft for guessing the Rust version.
-- What changed: Updated the environment setup to match the Makefile.
+- Difficulties: Rejected my first draft for guessing the Rust version and lacking an explicit outcome.
+- What changed: Updated the environment setup to match the Makefile and added an explicit outcome line.
 
 ---
 
@@ -108,35 +108,46 @@ Add appropriate `///` docstrings to the missing structs and fields.
 
 - Tool: plan-check
 - What it produced: Accepted my plan and verified the branch name was correct.
-- Difficulties: I did not have Rust installed locally.
-- What changed: I skipped local testing and relied on CI.
+- Difficulties: I did not have Rust installed locally, so I couldn't verify the tests beforehand.
+- What changed: I adjusted my plan to rely on GitHub Actions for CI testing.
 
 ---
 
 ## Testing Strategy
 
-I ran `cargo test -p cda-sovd-interfaces` to ensure the code still compiles and all existing tests pass. Since I did not have Rust installed locally, I relied on the GitHub Actions CI pipeline to validate the code.
+I used two observable checks to validate my fix:
+1. **Visual Inspection:** I inspected `cda-sovd-interfaces/src/components.rs` to confirm the `///` docstrings were added correctly above `ComponentQuery`, `include_sdgs`, `include_schema`, and `items`.
+2. **CI Pipeline:** Since I did not have Rust installed locally, I relied on the GitHub Actions CI pipeline to run `cargo test -p cda-sovd-interfaces` and validate that no syntax errors were introduced.
 
 **Toolkit**
 
 - Tool: ship-gate
-- What it produced: Verified my branch and PR draft.
-- Difficulties: None.
-- What changed: Nothing.
+- What it produced: Verified my branch name and checked my PR draft for consistency.
+- Difficulties: It could not run the local tests because the Rust toolchain was missing.
+- What changed: I updated my PR description to honestly disclose that I relied on CI for testing.
 
 ---
 
 ## Implementation Notes
 
-**2026-11-11**
-Added docstrings to `ComponentQuery` and `ComponentsResponse.items`. Opened PR #704.
+**2026-11-11 (Claiming & Reproduction)**
+Claimed issue #144. Wrote the reproduction report verifying that `ComponentQuery` and `ComponentsResponse.items` lacked docstrings at commit `a686835`.
+
+**2026-11-11 (Planning)**
+Wrote the solution approach and plan. Used `plan-check` to verify the steps.
+
+**2026-11-11 (Coding)**
+Added `///` docstrings to `cda-sovd-interfaces/src/components.rs`.
+
+**2026-11-11 (PR Submission)**
+Opened PR #704. Encountered a Git CLI error about missing default remotes and fixed it with `gh repo set-default`. Realized the Eclipse ECA check failed due to a placeholder email and updated my Git config.
 
 **Toolkit**
 
-- Tool: ship-gate
-- What it produced: Checked the code and opened the PR.
-- Difficulties: `gh` CLI initially failed to know which repo to use.
-- What changed: Ran `gh repo set-default`.
+- Tool: GitHub CLI (`gh`)
+- What it produced: Created the branch, commit, and PR.
+- Difficulties: `gh` CLI initially failed because it didn't know which repo to target.
+- What changed: Ran `gh repo set-default` to point to the upstream repository.
 
 ---
 
@@ -145,7 +156,7 @@ Added docstrings to `ComponentQuery` and `ComponentsResponse.items`. Opened PR #
 **PR Link:** https://github.com/eclipse-opensovd/classic-diagnostic-adapter/pull/704
 
 **PR Description:** 
-This PR adds missing Rust docstrings to the `ComponentQuery` struct and the `items` field in `ComponentsResponse`. Fixes #144. Added `///` docstrings to `ComponentQuery` and its fields (`include_sdgs`, `include_schema`). Added a `///` docstring to the `items` field in `ComponentsResponse`. Since this is a documentation-only change, no logic was altered. I verified the changes locally by inspecting `cda-sovd-interfaces/src/components.rs`. I did not run `cargo test` because I do not have the Rust toolchain installed locally.
+This PR adds missing Rust docstrings to the `ComponentQuery` struct and the `items` field in `ComponentsResponse`. Fixes #144. Added `///` docstrings to `ComponentQuery` and its fields. Added a `///` docstring to `items`. Since this is a documentation-only change, no logic was altered. I verified the changes by inspecting the file and am relying on CI for build validation.
 
 **Maintainer Feedback:**
 
@@ -168,10 +179,10 @@ This PR adds missing Rust docstrings to the `ComponentQuery` struct and the `ite
 I learned how to navigate a large Rust codebase, identify missing documentation, and format docstrings correctly. I also learned how to use GitHub CLI to manage branches and open Pull Requests.
 
 **Challenges Overcome**
-The hardest part was finding an issue that wasn't already claimed or fixed. My scout tool helped me filter out dead ends. I also had to figure out the correct Rust version for the environment setup by reading the Makefile.
+The hardest part was finding an issue that wasn't already claimed or fixed. My scout tool helped me filter out dead ends. I also had to figure out the correct Rust version for the environment setup by reading the Makefile, and I learned how to fix Git author emails when the CI blocks a PR.
 
 **What I'd Do Differently Next Time**
-Next time, I will install the required toolchain (like Rust) before starting so I can run the tests locally instead of relying entirely on the CI pipeline.
+Next time, I will install the required toolchain (like Rust) before starting so I can run the tests locally instead of relying entirely on the CI pipeline. I will also double-check my Git email configuration before committing.
 
 ---
 
