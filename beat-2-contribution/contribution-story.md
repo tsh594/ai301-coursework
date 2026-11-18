@@ -69,7 +69,15 @@ The `cda-sovd-interfaces` crate.
 - Rust: 1.88.0 (pinned in the Makefile)
 - Repo: classic-diagnostic-adapter
 - Commit: a686835
-- **Setup Commands:** `git clone`, `git checkout a686835`.
+- **Setup Commands:**
+  ```bash
+  git clone https://github.com/tsh594/classic-diagnostic-adapter.git
+  cd classic-diagnostic-adapter
+  git checkout a686835
+  rustup install 1.88.0
+  cargo build
+  cargo test -p sovd-interfaces
+  ```
 - **Difficulties:** I did not have the Rust toolchain installed initially. I had to install Rust 1.88.0. Additionally, the Cargo package name is `sovd-interfaces`, but the folder is `cda-sovd-interfaces`, which caused my initial test commands to fail until I found the correct package name.
 
 **Steps to Reproduce**
